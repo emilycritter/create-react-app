@@ -9,7 +9,6 @@ import base from '../base';
 class App extends React.Component {
   constructor() {
     super();
-    this.addFish = this.addFish.bind(this);
     this.loadSamples = this.loadSamples.bind(this);
     this.addToOrder = this.addToOrder.bind(this);
     this.state = {
@@ -23,9 +22,20 @@ class App extends React.Component {
       context: this,
       state: 'fishes'
     });
+    const localStorageRef = localStorage.getItem(`order-${this.
+      props.params.storeId}`);
+    if (localStorageRef) {
+      this.setState({
+        order: JSON.parse(localStorageRef)
+      });
+    }
   }
   componentWillUnmount() {
     base.removeBinding(this.ref)
+  }
+  componentWillUpdate(nextProps, nextState) {
+    localStorage.setItem(`order-${this.props.params.storeId}`,
+       JSON.stringify(nextState.order));
   }
   addFish(fish) {
     // get the current state
@@ -64,7 +74,11 @@ class App extends React.Component {
             }
           </ul>
         </div>
-        <Order fishes={this.state.fishes} order={this.state.order} />
+        <Order
+          fishes={this.state.fishes}
+          order={this.state.order}
+          params={this.props.params}
+        />
         <Inventory addFish={this.addFish} loadSamples={this.loadSamples} />
       </div>
     )
